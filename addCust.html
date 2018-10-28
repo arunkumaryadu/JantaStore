@@ -1,0 +1,78 @@
+<html>
+<title>AJAX_PHP_Jquery</title>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+$(function(){
+	$("#spn2").hide();
+	$("#txt1").focus(function(){
+		$("#txt2").val("");
+		$("#txt3").val("");
+		$("#txt4").val("");
+		$("#txt5").val("");
+		$("#txt6").val("");
+		$("#spn2").hide();
+	});
+	$("#btn3").click(function(){
+	        request=$.ajax({
+            url: "addCust.php",
+            method: "POST",
+            data: $('form').serialize(),
+            dataType: "json"
+      });
+
+            request.done(function( response ) {
+								$("#spn2").show();
+							$("#txt2").val(response.customerName);
+              $("#txt3").val(response.address);
+							$("#txt4").val(response.city);
+							$("#txt5").val(response.pin);
+							$("#txt6").val(response.amount);
+							$("#spn1").html(response.err);
+            });
+
+            request.fail(function( jqXHR, textStatus ) {
+				     	$("#spn1").html(textStatus)
+            });
+    });
+
+    $("#btn2").click(function(event){
+	        event.preventDefault();
+            request=$.ajax({
+            url: "addCust.php",
+            method: "POST",
+            data: $('form').serialize(),
+            dataType: "json"
+                          });
+
+            request.done(function( response1) {
+	            	$("#spn1").html(response1.err)
+								$("#txt1").focus();
+            });
+
+            request.fail(function( jqXHR, textStatus ) {
+	        alert("Request failed: " + textStatus);
+            });
+    });
+
+		$("#btn1").click(function(){
+
+		});
+});//end of onload event function.
+</script>
+</head>
+<body>
+<form method="post">
+<input type="text"  name="contact" id="txt1" placeholder="Enter Mobile Number" /><input type="button" name="btn3" value="Check" id="btn3"/><span id="spn1"></span><br/>
+<span id="spn2">
+
+<input type="text"  name="customerName" id="txt2" placeholder="Enter customer Name" /><br/>
+<input type="text"  name="address" id="txt3" placeholder="Enter address"/><br/>
+<input type="text"  name="city" id="txt4" placeholder="Enter city"/><br/>
+<input type="text"  name="pin" id="txt5" placeholder="Enter pin"/><br/>
+<input type="text"  name="amount" id="txt6" placeholder="Enter Outstanding amount"/><br/>
+<input type="button" name="btn1" value="AddItem" id="btn1"/>
+<input type="submit" name="btn2" value="Save" id="btn2"/><span>
+</form>
+</body>
+</html>

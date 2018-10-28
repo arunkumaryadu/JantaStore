@@ -1,0 +1,79 @@
+<html>
+<title>AJAX_PHP_Jquery</title>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script> 
+$(function(){
+
+
+	function catChoice(){		
+	        request=$.ajax({
+            url: "catChoice.php",
+            method: "POST",
+            dataType: "text"
+                          });	
+
+            request.done(function( response ) {		
+	        $("#catSelect").html("<option value=\"Select\">Select Category</option><br>"+response);
+            });
+ 
+            request.fail(function( jqXHR, textStatus ) {
+	        //$("#div1").html("Request failed: " + textStatus);
+            });  
+    }
+    function itemChoice(){       
+            request=$.ajax({
+            url: "itemChoice.php",
+            method: "POST",
+            dataType: "text"
+                          });   
+
+            request.done(function( response ) {     
+            $("#itemSelect").html("<option value=\"Select\">Select Item</option><br>"+response);
+            });
+ 
+            request.fail(function( jqXHR, textStatus ) {
+            //$("#div1").html("Request failed: " + textStatus);
+            });  
+    }
+    catChoice();
+    itemChoice();
+
+    $("#btn1").click(function(event){		
+	        event.preventDefault();		   
+            request=$.ajax({
+            url: "updateItem.php",
+            method: "POST",
+            data: $('form').serialize(),
+            dataType: "text"
+                          });	
+
+            request.done(function( response1) {		
+	        $("#div1").html(response1);
+            });
+ 
+            request.fail(function( jqXHR, textStatus ) {
+	        $("#div1").html("Request failed: " + textStatus);
+            });  
+    });
+
+});//end of onload event function.
+</script>
+</head>
+<body>
+<form>
+<select id="itemSelect" name="itemName">
+<option value="Select">Select Category</option>
+</select><br/>
+<input type="text"  name="quantity" placeholder="Enter quantity" /><br/>
+<input type="text"  name="price" placeholder="Enter price per itme"/><br/>
+<select id="catSelect" name="categoryname">
+<option value="Select">Select Category</option>
+</select><br/>
+<input type="button" name="itemUpdate" value="Update Item" id="btn1"/>
+</form>
+<div id="div1">
+	
+</div>
+</body>
+</html>

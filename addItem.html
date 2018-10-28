@@ -1,0 +1,58 @@
+<html>
+<title>AJAX_PHP_Jquery</title>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+$(function(){
+	$("#txt1").click(function(){
+	        request=$.ajax({
+            url: "catChoice.php",
+            method: "POST",
+            dataType: "text"
+                          });
+
+            request.done(function( response ) {
+	        $("select").html("<option value=\"Select\">Select Category</option><br>"+response);
+            });
+
+            request.fail(function( jqXHR, textStatus ) {
+	        //$("#div1").html("Request failed: " + textStatus);
+            });
+    });
+
+    $("#btn1").click(function(event){
+	        event.preventDefault();
+            request=$.ajax({
+            url: "addItem.php",
+            method: "POST",
+            data: $('form').serialize(),
+            dataType: "text"
+                          });
+
+            request.done(function( response1) {
+	        $("#div1").html(response1);
+            });
+
+            request.fail(function( jqXHR, textStatus ) {
+	        $("#div1").html("Request failed: " + textStatus);
+            });
+    });
+
+});//end of onload event function.
+</script>
+</head>
+<body>
+<form method="post">
+<input type="text"  name="itemName" id="txt1" placeholder="Enter item name" /><br/>
+<input type="text"  name="quantity" placeholder="Enter quantity" /><br/>
+<input type="text"  name="price" placeholder="Enter price per itme"/><br/>
+<select name="slt1">
+<option value="Select">Select Category</option>
+</select>
+<input type="button" name="itemAdd" value="Add Item" id="btn1"/>
+</form>
+<div id="div1">
+
+</div>
+</body>
+</html>

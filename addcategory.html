@@ -1,0 +1,41 @@
+<html>
+<title>AJAX_PHP_Jquery</title>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+$(function(){
+	$("#btn1").click(function(event){
+	event.preventDefault();		
+   request=$.ajax({
+        url: "addcategory.php",
+        method: "POST",
+        data: $('form').serialize(),
+       dataType: "text"
+});	
+
+request.done(function( response ) {	
+	$("#div1").html(response);
+});
+ 
+request.fail(function( jqXHR, textStatus ) {
+	$("#div1").html("Request failed: " + textStatus);
+  
+});  
+
+});
+
+});//end of onload event function.
+</script>
+</head>
+<style>
+</style>
+<body>
+<form>
+<input type="text"  name="catName"/><br/>
+<input type="button" name="catAdd" value="Add Category" id="btn1"/>
+</form>
+<div id="div1"> <span id="spn1"> </span>
+	
+</div>
+</body>
+</html>
