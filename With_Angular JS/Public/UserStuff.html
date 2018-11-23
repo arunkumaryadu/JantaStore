@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>JantaStore</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.5/angular.min.js"></script>
+  <script type="text/javascript">
+    var app = angular.module("app", []);
+    app.controller("EntrySalesController", function($scope, $http) {
+      // Check Customer
+      $scope.custCheck = function() {
+        $scope.custMobile1 = $scope.custMobile;
+        $http.get("/cust_check", {
+          params: {
+            custMobile: $scope.custMobile
+          }
+        }).then(function(res) {
+          console.log(res.data.length);
+          if (res.data.length > 0) {
+            $scope.custName = res.data[0].customerName;
+            $scope.custAddress = res.data[0].address;
+            $scope.custCity = res.data[0].city;
+            $scope.custPin = res.data[0].pin;
+            $scope.custOA = res.data[0].amount;
+          } else {
+            //console.log("please Register");
+            $scope.custName = "";
+            $scope.custAddress = "";
+            $scope.custCity = "";
+            $scope.custPin = "";
+            $scope.custOA = "";
+
+            $scope.msg = "Please Register !!!";
+          }
+        });
+      }
+
+      // Add Update Customer
+      $scope.custAddUp = function() {
+        console.log($scope.custName + " ");
+        $http.get("/add_update_cust", {
+          params: {
+            custName: $scope.custName,
+            custAddress: $scope.custAddress,
+            custCity: $scope.custCity,
+            custPin: $scope.custPin,
+            custOA: $scope.custOA,
+            custMobile: $scope.custMobile
+          }
+        }).then(function(res) {
+          console.log(res);
+          $scope.custMobileSelect = $scope.custMobile;
+          //$scope.message = res.data.status;
+          console.log(res.data.status);
+          $scope.msg = res.data.status;
+        });
+      }
+
+      // Item SELECT
+      $scope.itemChoice = function() {
+        $http.get("/itemChoice").then(function(response) {
+          console.log(response);
+          var a = [];
+          for (var i = 0; i < response.data.length; i++) {
+            a.push(response.data[i].itemName);
+          }
+          $scope.itemnames = a;
+          //console.log($scope.itemnames);
+        });
+      }
+
+      // Add On sales Register
+      $scope.AddOnBill = function() {
+        $http.get("/add_on_bill", {
+          params: {
+            custMobile: $scope.custMobile1,
+            itemnameAdd: $scope.itemnameAdd,
+            quantity: $scope.quantity,
+
+          }
+        }).then(function(res) {
+          console.log(res.data.status);
+          $scope.msg = res.data.status;
+        });
+      }
+    });
+
+    app.controller("salesController", function($scope, $http) {
+      function ListOfCustomer() {
+        $http.get("/ListOfCustomer").then(function(response) {
+          console.log(response.data);
+          var a = [];
+          for (var i = 0; i < response.data.length; i++) {
+            a.push(response.data[i].itemName);
+          }
+          $scope.ListOfCust = response.data;
+          console.log($scope.ListOfCust);
+        });
+        $scope.CustSerialNo = 0;
+      }
+      ListOfCustomer();
+      $scope.checkOA = function() {
+        $http.get("/checkOA", {
+          params: {
+            custMobile: $scope.custMobilecheckOA
+          }
+        }).then(function(response) {
+          console.log(response.data[0]);
+
+          $scope.checkOAbtnspn = response.data;
+        });
+      }
+    });
+  </script>
+</head>
+
+<body ng-app="app">
+  <div>
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">JantaStore</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto"></ul>
+        <form class="form-inline my-2 my-lg-0" ng-submit="getLogin()">
+          <input class="form-control mr-sm-2" type="search" placeholder="Enter user name" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
+        </form>
+      </div>
+    </nav><br /><br /><br />
+    <div>
+      <div class="row">
+        <div class="col-4">
+          <div class="list-group" id="list-tab" role="tablist">
+            <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">Entry On Sales Register</a>
+            <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">Check Outstanding Amount</a>
+            <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab" aria-controls="messages">Messages</a>
+            <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings" role="tab" aria-controls="settings">Settings</a>
+          </div>
+        </div>
+        <div class="col-8">
+          <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
+              <div class="card">
+                <h5 class="card-header bg-primary text-white">Entry On Sales Register</h5>
+                <div class="card-body" ng-controller="EntrySalesController">
+                  <p class="card-text">
+                    <span>
+                      <form ng-submit="custAddUp()">
+                        <table class="table table-borderless">
+                          <thead>
+                            <tr>
+                              <th scope="col"> <input type="number" ng-model="custMobile" placeholder="Enter Mobile number" ng-click="itemChoice()" ng-blur="custCheck()" required /></th>
+                              <th scope="col"> <input type="text" ng-model="custName" placeholder="Enter Customer Name" required /></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td> <input type="text" ng-model="custCity" placeholder="Enter Customer City" required /></td>
+                              <td><input type="number" ng-model="custPin" placeholder="Enter Pin code" required /></td>
+                            </tr>
+                            <tr>
+                              <td><input type="text" ng-model="custAddress" placeholder="Enter Customer Address" required /></td>
+                              <td><input type="number" ng-model="custOA" placeholder="Enter Outstanding Amount" required /></td>
+                            </tr>
+                            <tr>
+                              <td><input type="submit" ng-model="custAddUpbtn" value="Add/Upate Customer" required /></td>
+                              <td><span class="text-danger">{{msg}}</span></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </form>
+                    </span>
+                    <span>
+                      <form ng-submit="AddOnBill()">
+                        <table class="table table-borderless">
+                          <tbody>
+                            <tr>
+                              <th scope="row"> Select Item </th>
+                              <td><select ng-model="itemnameAdd">
+                                  <option ng-repeat="x in itemnames">{{x}}</option>
+                                </select> </td>
+                            </tr>
+                            <tr>
+                              <th scope="row"> <input type="number" ng-model="quantity" placeholder="Enter quantity" required /></th>
+                              <td> <input type="number" ng-model="custMobile1" ng-disabled="true" required /></td>
+                            </tr>
+                            <tr>
+                              <th scope="row"> <input type="submit" value="AddOnBill" /></th>
+                              <td colspan="2"></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </form>
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
+              <div ng-controller="salesController">
+                <div class="card">
+                  <h5 class="card-header bg-primary text-white">Check Outstanding Amount</h5>
+                  <div class="card-body">
+                    <h5 class="card-title">Total Number Of Customer Who have Outstanding Amount : {{ListOfCust.length}}</h5>
+                    <p class="card-text">
+                      <form ng-submit="checkOA()">
+                        <input type="number" ng-model="custMobilecheckOA" placeholder="Enter Mobile number" ng-click="itemChoice()" ng-blur="custCheck()" required /> <input type="submit" ng-model="checkOAbtn" value="Search" required /><br /><br />
+                          </form>
+                        <span>
+                          <div >
+                              <table class="table">
+                                <thead class="thead-dark">
+                                  <tr>
+                                    <th scope="col">Customer Mobile</th>
+                                    <th scope="col">Customer Name</th>
+                                    <th scope="col">Outstanding Amount</th>
+                                    <th scope="col">Address</th>
+                                    <th scope="col">City</th>
+                                    <th scope="col">Pin</th>
+                                  </tr>
+                                </thead>
+                                <tbody ng-if='checkOAbtnspn' class="bg-info">
+                                  <tr ng-repeat='x in checkOAbtnspn'>
+                                    <th scope="row">{{x.contact}}</th>
+                                    <td>{{x.customerName}}</td>
+                                    <td>{{x.amount}}</td>
+                                    <td>{{x.address}}</td>
+                                    <td>{{x.city}}</td>
+                                    <td>{{x.pin}}</td>
+                                  </tr>
+                                </tbody>
+                                <tbody>
+                                  <tr ng-repeat='x in ListOfCust'>
+                                    <th scope="row">{{x.contact}}</th>
+                                    <td>{{x.customerName}}</td>
+                                    <td>{{x.amount}}</td>
+                                    <td>{{x.address}}</td>
+                                    <td>{{x.city}}</td>
+                                    <td>{{x.pin}}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+
+                          </div>
+                        </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">...</div>
+            <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

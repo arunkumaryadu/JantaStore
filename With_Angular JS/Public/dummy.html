@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+   <script type="text/javascript">
+
+    var app = angular.module("app",[]);
+      app.controller("JantaStoreController", function ($scope,$http) {
+        $scope.f1=function() {
+                $http.get("/getLogin",{params:{userName:$scope.utxt1,password:$scope.utxt2}});
+                console.log("gfdd");}
+
+                $scope.itemAdd = function() {
+                  $http.get("/update_item", {
+                    params: {
+                      itemName: $scope.itemNameAdd,
+                      quantity: $scope.quantityAdd,
+                      price: $scope.priceAdd,
+                      categoryname: $scope.categorynameAdd
+                    }
+                  }).then(function(res) {
+                    console.log(res);
+                    //$scope.message = res.data.status;
+                  });
+                }
+
+
+});
+
+    </script>
+
+  </head>
+  <body ng-app="app">
+      <div ng-controller="JantaStoreController">
+        <span>
+          <form ng-submit="itemUpdate()">
+            <input type="text" ng-model="itemNameUpdate" placeholder="Enter item name" ng-click="catChoice()" /><br />
+            <input type="number" ng-model="quantityUpdate" placeholder="Enter quantity" /><br />
+            <input type="number" ng-model="priceUpdate" placeholder="Enter price per itme" /><br />
+            <select ng-model="categorynameUpdate">
+              <option ng-repeat="x in catnames">{{x}}</option>
+            </select>
+            <input type="submit" value="Add Item" />
+          </form>
+        </span>
+  </div>
+  </body>
+</html>

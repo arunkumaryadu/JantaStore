@@ -1,0 +1,35 @@
+var app = angular.module("app",[]);
+
+app.controller('employeeController', function ($scope, $http) {
+
+    $http.get("/path",{
+        params:{key:$scope.value}
+    }).then(function (res) {
+        $scope.data = res.data;
+    });
+
+    var x =JSON.stringify({key:$scope.value});
+    $http.post("/path",x)           
+    .then(function (res) {
+        var data  = res.data;
+        $scope.message = data.msg;
+    })
+}
+
+ng-app="app"
+
+ng-controller="Controller"
+
+ng-if = "variable"
+
+ng-repeat="x in array"
+{{x.key}}
+
+ng-click="function()"
+
+ng-blur ="function()"
+
+ng-model="variable"
+
+{{variable}}
+

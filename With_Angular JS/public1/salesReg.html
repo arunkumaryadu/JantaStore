@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+  <script type="text/javascript">
+    var app = angular.module("app", []);
+    app.controller("salesController", function($scope, $http) {
+
+      $scope.itemChoice = function() {
+        $http.get("/itemChoice").then(function(response) {
+          console.log(response);
+          var a = [];
+          for (var i = 0; i < response.data.length; i++) {
+            a.push(response.data[i].itemName);
+          }
+          $scope.itemnames = a;
+          console.log($scope.itemnames);
+        });
+
+      }
+
+$scope.custCheck=function(){
+  $scope.custMobile1=$scope.custMobile;
+  $http.get("/cust_check", {
+    params: {
+      custMobile:$scope.custMobile
+    }
+  }).then(function(res) {
+    console.log(res.data.length);
+    if(res.data.length>0){
+      $scope.custName=res.data[0].customerName;
+      $scope.custAddress=res.data[0].address;
+      $scope.custCity=res.data[0].city;
+      $scope.custPin=res.data[0].pin;
+      $scope.custOA=res.data[0].amount;
+    }else{
+      console.log("please Register");
+    }
+  });
+}
+// Add Update Customer
+$scope.custAddUp = function() {
+  console.log($scope.custName+" ");
+  $http.get("/add_update_cust", {
+    params: {
+      custName: $scope.custName,
+      custAddress: $scope.custAddress,
+      custCity: $scope.custCity,
+      custPin: $scope.custPin,
+      custOA: $scope.custOA,
+      custMobile:$scope.custMobile
+    }
+  }).then(function(res) {
+    console.log(res);
+    $scope.custMobileSelect=$scope.custMobile;
+    //$scope.message = res.data.status;
+  });
+}
+
+// AddOnBill
+
+$scope.AddOnBill=function(){
+  $http.get("/add_on_bill", {
+    params: {
+      custMobile:$scope.custMobile1,
+      itemnameAdd: $scope.itemnameAdd,
+      quantity: $scope.quantity,
+      price: $scope.price
+    }
+  }).then(function(res) {
+    console.log(res);
+    //$scope.message = res.data.status;
+  });
+}
+    });
+  </script>
+
+</head>
+
+<body ng-app="app">
+  <div ng-controller="salesController">
+    <span>
+      <form ng-submit="custAddUp()">
+        <input type="number" ng-model="custMobile" placeholder="please Enter Mobile number" ng-click="itemChoice()" ng-blur="custCheck()" required/><br/><br/>
+        <span ng-model="custAddSpn">
+          <input type="text" ng-model="custName" placeholder="Please Enter Customer Name" required/><br/><br/>
+          <input type="text" ng-model="custAddress" placeholder="Please Enter Customer Address" required/><br/><br/>
+          <input type="text" ng-model="custCity" placeholder="Please Enter Customer City" required/><br/><br/>
+          <input type="text" ng-model="custPin" placeholder="Please Enter Pin code" required/><br/><br/>
+          <input type="number" ng-model="custOA" placeholder="Please Enter Outstanding Amount" required/><br/><br/>
+          <input type="submit" ng-model="custAddUpbtn" value="Add/Upate Customer" required/><br/><br/>
+        </span>
+      </form>
+    </span>
+    <span>
+      <form ng-submit="AddOnBill()">
+        <input type="number" ng-model="custMobile1" ng-disabled="true"/><br/><br/>
+
+          <select ng-model="itemnameAdd">
+            <option ng-repeat="x in itemnames">{{x}}</option>
+          </select>
+          <input type="number" ng-model="quantity" placeholder="Enter quantity"required/>
+          <input type="number" ng-model="price" placeholder="Enter price" required/>
+          <span ng-model="totalBill"></span>
+          <input type="submit" value="AddOnBill"/>
+
+      </form>
+    </span>
+  </div>
+</body>
+</html>

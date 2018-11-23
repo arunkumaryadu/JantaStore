@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+  <script type="text/javascript">
+    var app = angular.module("app", []);
+    app.controller("salesController", function($scope, $http) {
+            $scope.ListOfCustomer = function() {
+              $http.get("/ListOfCustomer").then(function(response) {
+                console.log(response.data);
+                var a = [];
+                for (var i = 0; i < response.data.length; i++) {
+                  a.push(response.data[i].itemName);
+                }
+                $scope.ListOfCust = response.data;
+                console.log($scope.ListOfCust);
+              });
+              $scope.CustSerialNo=0;
+            }
+            $scope.checkOA = function() {
+              $http.get("/checkOA",{
+                params: {
+                  custMobile:$scope.custMobilecheckOA
+                }
+              }).then(function(response) {
+                console.log(response.data[0]);
+
+              $scope.checkOAbtnspn=response.data;
+              });
+            }
+    });
+  </script>
+
+</head>
+
+<body ng-app="app">
+  <div ng-controller="salesController">
+    <span>
+      <form ng-submit="checkOA()">
+        <input type="number" ng-model="custMobilecheckOA" placeholder="please Enter Mobile number" ng-click="itemChoice()" ng-blur="custCheck()" required/><br/><br/>
+        <input type="submit" ng-model="checkOAbtn" value="Check Outstanding Amount" required/><br/><br/>
+
+        <span><div ng-if='checkOAbtnspn'>
+          <table border="1">
+            <tr>
+              <th>Customer Mobile</th>
+              <th>Customer Name</th>
+              <th>Outstanding Amount</th>
+              <th>Address</th>
+              <th>City</th>
+              <th>Pin</th>
+            </tr>
+            <tr ng-repeat='x in checkOAbtnspn'>
+              <td>{{x.contact}}</td>
+              <td>{{x.customerName}}</td>
+              <td>{{x.amount}}</td>
+              <td>{{x.address}}</td>
+              <td>{{x.city}}</td>
+              <td>{{x.pin}}</td>
+            </tr>
+          </table>
+        </div>
+      </span>
+      </form>
+    </span>
+    <span>
+      <input type="button" ng-click="ListOfCustomer()"/>
+      <div ng-if='ListOfCust'>
+      Total Number Of Customer Who have Outstanding  Amount :  {{ListOfCust.length}}
+        <table border="1">
+          <tr>
+
+            <th>Customer Mobile</th>
+            <th>Customer Name</th>
+            <th>Outstanding Amount</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>Pin</th>
+          </tr>
+          <tr ng-repeat='x in ListOfCust'>
+
+            <td>{{x.contact}}</td>
+            <td>{{x.customerName}}</td>
+            <td>{{x.amount}}</td>
+            <td>{{x.address}}</td>
+            <td>{{x.city}}</td>
+            <td>{{x.pin}}</td>
+          </tr>
+        </table>
+      </div>
+    </span>
+  </div>
+</body>
+</html>

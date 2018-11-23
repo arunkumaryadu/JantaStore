@@ -1,0 +1,60 @@
+ $(function () {
+
+    var idvalue = $("#id").val();
+
+    var x = $("#id");
+    var xvalue = x.val();
+
+    $("#id").text("Messgae");
+    $("#id").html("<tag> Messgae </tag>");
+    $("#id").val("Messgae");
+
+    $("#id").css("color","black");
+    $("#id").css({"color":"black","font-size":"18px"});
+
+
+    $("#id").click(function () {
+
+    }
+
+    $("#id").blur(function () {
+        
+    }
+      
+
+    $.ajax({
+    type: "GET",
+    url: "url",
+    data: {"key":"value","key":"value"},
+    dataType:"JSON" 
+    }).done(function(data) {
+        var result = JSON.parse(data);
+        if(!result){
+        location.href = "index.html";
+        }
+        else $("#id").text("Messgae");
+    });
+   
+    $.ajax({
+        type: "POST",
+        url: url,
+        data:  {"key":"value","key":"value"},
+        dataType:"JSON" 
+    }).done(function(data) {
+        var result = JSON.parse(data);
+    });
+
+
+
+    var form = $("#formid");
+    var url = form.attr('action');
+    data : form.serialize();
+
+    var queryString = decodeURIComponent(window.location.search);
+    queryString = queryString.substring(1);
+    var queries = queryString.split("&");
+    var que = queries[i].split("=");
+    $("#"+que[0]+"").val(que[1]);
+});
+
+
