@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>JantaStore</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.5/angular.min.js"></script>
+  <style>
+    select option:empty { display:none }
+  </style>
+
+  <script type="text/javascript">
+    var app = angular.module("app", []);
+    app.controller("EntrySalesController", function($scope, $http) {
+      // Check Customer
+      $scope.custCheck = function() {
+        $scope.custMobile1 = $scope.custMobile;
+        $http.get("/cust_check", {
+          params: {
+            custMobile: $scope.custMobile
+          }
+        }).then(function(res) {
+          console.log(res.data.length);
+          if (res.data.length > 0) {
+            $scope.custName = res.data[0].customerName;
+            $scope.custAddress = res.data[0].address;
+            $scope.custCity = res.data[0].city;
+            $scope.custPin = res.data[0].pin;
+            $scope.custOA = res.data[0].amount;
+          } else {
+            //console.log("please Register");
+            $scope.custName = "";
+            $scope.custAddress = "";
+            $scope.custCity = "";
+            $scope.custPin = "";
+            $scope.custOA = "";
+
+            $scope.msg = "Please Register !!!";
+          }
+        });
+      }
+
+      // Add Update Customer
+      $scope.custAddUp = function() {
+        console.log($scope.custName + " ");
+        $http.get("/add_update_cust", {
+          params: {
+            custName: $scope.custName,
+            custAddress: $scope.custAddress,
+            custCity: $scope.custCity,
+            custPin: $scope.custPin,
+            custOA: $scope.custOA,
+            custMobile: $scope.custMobile
+          }
+        }).then(function(res) {
+          console.log(res);
+          $scope.custMobileSelect = $scope.custMobile;
+          //$scope.message = res.data.status;
+          console.log(res.data.status);
+          $scope.msg = res.data.status;
+        });
+      }
+
+      // Item SELECT
+      $scope.itemChoice = function() {
+        $http.get("/itemChoice").then(function(response) {
+          console.log(response);
+          var a = [];
+          for (var i = 0; i < response.data.length; i++) {
+            a.push(response.data[i].itemName);
+          }
+          $scope.itemnames = a;
+          //console.log($scope.itemnames);
+        });
+      }
+
+      // Add On sales Register
+      $scope.AddOnBill = function() {
+        $http.get("/add_on_bill", {
+          params: {
+            custMobile: $scope.custMobile1,
+            itemnameAdd: $scope.itemnameAdd,
+            quantity: $scope.quantity,
+
+          }
+        }).then(function(res) {
+          console.log(res.data.status);
+          $scope.msg = res.data.status;
+        });
+      }
+    });
+
+    app.controller("salesController", function($scope, $http) {
+      function ListOfCustomer() {
+        $http.get("/ListOfCustomer").then(function(response) {
+          console.log(response.data);
+          var a = [];
+          for (var i = 0; i < response.data.length; i++) {
+            a.push(response.data[i].itemName);
+          }
+          $scope.ListOfCust = response.data;
+          console.log($scope.ListOfCust);
+        });
+        $scope.CustSerialNo = 0;
+      }
+      ListOfCustomer();
+      $scope.checkOA = function() {
+        $http.get("/checkOA", {
+          params: {
+            custMobile: $scope.custMobilecheckOA
+          }
+        }).then(function(response) {
+          console.log(response.data[0]);
+
+          $scope.checkOAbtnspn = response.data;
+        });
+      }
+
+      $scope.catDisplay = function() {
+        var lc = [];
+        $http.get("/display_category").then(function(response) {
+
+          for (var i = 0; i < response.data.length; i++) {
+            lc.push(response.data[i].categoryname);
+          }
+          //$scope.catnames = lc;
+
+          $scope.listOfCat = lc;
+          console.log($scope.listOfCat);
+
+        });
+      }
+        $scope.catDisplay();
+
+
+
+        /*
+
+                        ITEM Select
+
+        */
+
+        $scope.ListOfItem = function() {
+          $http.get("/display_item_list").then(function(response) {
+            $scope.ListOfItemForDisplay = response.data;
+          });
+          $scope.ItemSerialNo = 0;
+        }
+        $scope.ListOfItem();
+        $scope.ListOfItemForDisplayByItemName = function() {
+          $http.get("/ListOfItemForDisplayByItemName", {
+            params: {
+              itemname: $scope.itemnameItemDisplay
+            }
+          }).then(function(response) {
+            console.log(response.data);
+            $scope.SingleItemSelect = response.data;
+          });
+        }
+
+        $scope.ListOfItemForDisplayByCategoryName = function() {
+          $http.get("/ListOfItemForDisplayByCategoryName", {
+            params: {
+              catname: $scope.categorynameItemDisplay
+            }
+          }).then(function(response) {
+            console.log(response.data);
+            $scope.SingleItemSelect = response.data;
+          });
+        }
+
+        $scope.ListOfItemForDisplayByQuantity = function() {
+          $http.get("/ListOfItemForDisplayByQuantity", {
+            params: {
+              quantity: $scope.QuantityItemDisplay
+            }
+          }).then(function(response) {
+            console.log(response.data);
+            $scope.SingleItemSelect = response.data;
+          });
+        }
+        $scope.catChoice = function() {
+          $http.get("/catChoice").then(function(response) {
+            var a = [];
+            for (var i = 0; i < response.data.length; i++) {
+              a.push(response.data[i].categoryname);
+            }
+            $scope.catnames = a;
+            console.log($scope.catnames);
+          });
+          $scope.itemNameAdd = "";
+          $scope.quantityAdd = "";
+          $scope.priceAdd = "";
+          $scope.itemAddMsg = "";
+        }
+        $scope.catChoice();
+
+
+        $scope.itemChoice = function() {
+          $http.get("/itemChoice").then(function(response) {
+            console.log(response);
+            var a = [];
+            for (var i = 0; i < response.data.length; i++) {
+              a.push(response.data[i].itemName);
+            }
+            $scope.itemnames = a;
+            console.log($scope.itemnames);
+          });
+
+        }
+        $scope.itemChoice();
+
+
+    });
+    app.controller("showSales",function($scope,$http){
+
+          $scope.sendDates=function() {
+                    $http.get("/send_dates",{params:{date1:$scope.date1,date2:$scope.date2}}).then(function (response) {
+                        console.log("transaction between dates");
+
+                       for(var i=0;i<response.data.length;i++){
+                            var myDate = new Date(response.data[i].DateOfSale);
+                            var d=myDate.getDate();
+                            var m=myDate.getMonth()+1;
+                            var date=d+"/"+m+"/"+myDate.getFullYear();
+                            response.data[i].DateOfSale=date;
+                         }
+                        $scope.listOfTransaction = response.data;
+                      //  $scope.message="Successfully Displayed";
+                    });
+                }
+        });
+
+        app.controller("logoutController",function($scope,$http){
+
+              $scope.getlogoff=function() {
+                          window.location ="loginPage.html";
+                    }
+            });
+
+        //logoutController
+  </script>
+</head>
+<body ng-app="app">
+  <div>
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary text-white">
+      <a class="navbar-brand" href="#">JantaStore</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent" ng-controller="logoutController">
+        <ul class="navbar-nav mr-auto"></ul>
+        <form ng-submit="getlogoff()">
+          <input type="submit" name="logout" value="Logout" class="btn btn-primary"/>
+        </form>
+      </div>
+    </nav><br /><br /><br />
+    <div>
+      <div class="row">
+        <div class="col-4">
+          <div class="list-group" id="list-tab" role="tablist">
+            <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">Entry On Sales Register</a>
+            <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">Check Outstanding Amount</a>
+            <a class="list-group-item list-group-item-action" id="list-viewSales-list" data-toggle="list" href="#list-viewSales" role="tab" aria-controls="viewSales">View Sales</a>
+            <a class="list-group-item list-group-item-action" id="list-DisplayItem1-list" data-toggle="list" href="#list-DisplayItem1" role="tab" aria-controls="DisplayItem1" ng-click="ListOfItem()">Display Item</a>
+            <a class="list-group-item list-group-item-action" id="list-DisplayCategory1-list" data-toggle="list" href="#list-DisplayCategory1" role="tab" aria-controls="DisplayCategory1" ng-click="catDisplay()">Show Category</a>
+
+          </div>
+        </div>
+        <div class="col-8">
+          <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
+              <div class="card">
+                <h5 class="card-header bg-primary text-white">Entry On Sales Register</h5>
+                <div class="card-body" ng-controller="EntrySalesController">
+                  <p class="card-text">
+                    <span>
+                      <form ng-submit="custAddUp()">
+                        <table class="table table-borderless">
+                          <thead>
+                            <tr>
+                              <th scope="col"> <input type="number" ng-model="custMobile" placeholder="Enter Mobile number" ng-click="itemChoice()" ng-blur="custCheck()" required /></th>
+                              <th scope="col"> <input type="text" ng-model="custName" placeholder="Enter Customer Name" required /></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td> <input type="text" ng-model="custCity" placeholder="Enter Customer City" required /></td>
+                              <td><input type="number" ng-model="custPin" placeholder="Enter Pin code" required /></td>
+                            </tr>
+                            <tr>
+                              <td><input type="text" ng-model="custAddress" placeholder="Enter Customer Address" required /></td>
+                              <td><input type="number" ng-model="custOA" placeholder="Enter Outstanding Amount" required /></td>
+                            </tr>
+                            <tr>
+                              <td><input type="submit" class="btn btn-primary text-white" ng-model="custAddUpbtn" value="Add/Upate Customer" required /></td>
+                              <td><span class="text-danger">{{msg}}</span></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </form>
+                    </span>
+                    <span>
+                      <form ng-submit="AddOnBill()">
+                        <table class="table table-borderless">
+                          <tbody>
+                            <tr>
+                              <th scope="row"> Select Item </th>
+                              <td><select ng-model="itemnameAdd">
+                                  <option ng-repeat="x in itemnames">{{x}}</option>
+                                </select> </td>
+                            </tr>
+                            <tr>
+                              <th scope="row"> <input type="number" ng-model="quantity" placeholder="Enter quantity" required /></th>
+                              <td> <input type="number" ng-model="custMobile1" ng-disabled="true" required /></td>
+                            </tr>
+                            <tr>
+                              <th scope="row"> <input type="submit" value="AddOnBill" class="btn btn-primary text-white" /></th>
+                              <td colspan="2"></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </form>
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
+              <div ng-controller="salesController">
+                <div class="card">
+                  <h5 class="card-header bg-primary text-white">Check Outstanding Amount</h5>
+                  <div class="card-body">
+                    <h5 class="card-title">Total Number Of Customer Who have Outstanding Amount : {{ListOfCust.length}}</h5>
+                    <p class="card-text">
+                      <form ng-submit="checkOA()">
+                        <input type="number" ng-model="custMobilecheckOA" placeholder="Enter Mobile number" ng-click="itemChoice()" ng-blur="custCheck()" required /> <input type="submit" ng-model="checkOAbtn" value="Search" required /><br /><br />
+                      </form>
+                        <span>
+                          <div >
+                              <table class="table">
+                                <thead class="bg-primary text-white">
+                                  <tr>
+                                    <th scope="col">Customer Mobile</th>
+                                    <th scope="col">Customer Name</th>
+                                    <th scope="col">Outstanding Amount</th>
+                                    <th scope="col">Address</th>
+                                    <th scope="col">City</th>
+                                    <th scope="col">Pin</th>
+                                  </tr>
+                                </thead>
+                                <tbody ng-if='checkOAbtnspn' class="bg-info">
+                                  <tr ng-repeat='x in checkOAbtnspn'>
+                                    <th scope="row">{{x.contact}}</th>
+                                    <td>{{x.customerName}}</td>
+                                    <td>{{x.amount}}</td>
+                                    <td>{{x.address}}</td>
+                                    <td>{{x.city}}</td>
+                                    <td>{{x.pin}}</td>
+                                  </tr>
+                                </tbody>
+                                <tbody>
+                                  <tr ng-repeat='x in ListOfCust'>
+                                    <th scope="row">{{x.contact}}</th>
+                                    <td>{{x.customerName}}</td>
+                                    <td>{{x.amount}}</td>
+                                    <td>{{x.address}}</td>
+                                    <td>{{x.city}}</td>
+                                    <td>{{x.pin}}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+
+                          </div>
+                        </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="list-viewSales" role="tabpanel" aria-labelledby="list-viewSales-list">
+              <div ng-controller="showSales">
+  <span ng-model="dates">
+    <form ng-submit="sendDates()">
+      <input type="date" ng-model="date1" placeholder="Enter 1st date" required/>
+      <input type="date" ng-model="date2" placeholder="Enter 2nd date" required/>
+      <input type="submit" value="View Sales" class="btn btn-primary"/>
+    </form>
+  </span><br/><br/>
+  <div ng-if='listOfTransaction'>
+  <table class="table">
+    <thead class="thead bg-primary text-white">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Item Name</th>
+        <th scope="col">Date Of Sale</th>
+        <th scope="col">Unit Sold</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat='(key,transaction) in listOfTransaction'>
+        <th scope="row">{{key+1}}</th>
+        <td>{{transaction.itemName}}</td>
+        <td>{{transaction.DateOfSale}}</td>
+        <td>{{transaction.unitSold}}</td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+</div> </div>
+            <div class="tab-pane fade" id="list-DisplayItem1" role="tabpanel" aria-labelledby="list-DisplayItem1-list">
+              <div class="card" ng-controller="salesController">
+                <h5 class="card-header bg-primary text-white">Display Items</h5>
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <table class="table table-borderless">
+                      <tbody>
+                        <tr>
+                          <form ng-submit="ListOfItemForDisplayByCategoryName()">
+                            <th scope="row">Select Category : </th>
+                            <td>
+                              <div class="input-group">
+                                <select ng-model="categorynameItemDisplay" class="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon">
+                                  <option ng-repeat="x in catnames">{{x}}</option>
+                                </select>
+                                <div class="input-group-append">
+                                  <input type="submit" class="btn btn-primary" value="Search" />
+                                </div>
+                              </div>
+                            </td>
+                          </form>
+                        </tr>
+                        <tr>
+                          <form ng-submit="ListOfItemForDisplayByItemName()">
+                            <th scope="row">Select Item :</th>
+                            <td>
+                              <div class="input-group">
+                                <select ng-model="itemnameItemDisplay" ng-click="clear()" class="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon">
+                                  <option ng-repeat="x in itemnames">{{x}}</option>
+                                </select>
+                                <div class="input-group-append">
+                                  <input type="submit" class="btn btn-primary" value="Search" />
+                                </div>
+                              </div>
+
+                            </td>
+                          </form>
+                        </tr>
+                        <tr>
+                          <form ng-submit="ListOfItemForDisplayByQuantity()">
+                            <th scope="row">Quantity Less than :</th>
+                            <td>
+                              <div class="input-group">
+                                <select ng-model="QuantityItemDisplay" ng-click="clear()" class="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon">
+                                  <option ng-repeat="x in [1,5,10,20,50,100,200,500]">{{x}}</option>
+                                </select>
+                                <div class="input-group-append">
+                                  <input type="submit" class="btn btn-primary" value="Search" />
+                                </div>
+                              </div>
+
+                            </td>
+                          </form>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </h5>
+                  <p class="card-text">
+                    <div ng-if='ListOfItemForDisplay'>
+                      <table class="table">
+                        <thead class="bg-primary text-white">
+                          <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Item Name</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Category Name</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat='(key,x) in SingleItemSelect' class="bg-secondary">
+                            <th scope="row">{{key+1}}</th>
+                            <td>{{x.itemName}}</td>
+                            <td>{{x.quantity}}</td>
+                            <td>{{x.price}}</td>
+                            <td>{{x.categoryname}}</td>
+                          </tr>
+                          <tr ng-repeat='(key,x) in ListOfItemForDisplay'>
+                            <th scope="row">{{key+1}}</th>
+                            <td>{{x.itemName}}</td>
+                            <td>{{x.quantity}}</td>
+                            <td>{{x.price}}</td>
+                            <td>{{x.categoryname}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="list-DisplayCategory1" role="tabpanel" aria-labelledby="list-DisplayCategory1-list">
+              <div class="card" ng-controller="salesController">
+                <div class="card-header bg-primary text-white">
+                  Show Category
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <div ng-if='listOfCat'>
+                      <table class="table">
+                        <thead class="bg-primary text-white">
+                          <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Category Name</th>
+                          </tr>
+                        </thead>
+                        <tbody ng-repeat='(key,cat) in listOfCat'>
+                          <tr>
+                            <th scope="row">{{key+1}}</th>
+                            <td>{{cat}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </h5>
+                  <p class="card-text"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
